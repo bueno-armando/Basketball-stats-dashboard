@@ -17,7 +17,7 @@ def load_match_data(sheet_name):
 st.title("Dashboard de Análisis de Tiros")
 
 # Match selection dropdown
-match_options = ["Partido 1", "Partido 2", "Partido 3"]  # Add more matches as needed
+match_options = ["Partido 1", "Partido 2", "Partido 3", "Partido 4", "Partido 5"]
 selected_match = st.selectbox("Seleccionar Partido", match_options)
 
 # Load and process data for the selected match
