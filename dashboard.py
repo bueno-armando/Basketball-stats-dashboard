@@ -2,19 +2,24 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 
-# Read data from the spreadsheet (replace with your actual file)
-data = pd.read_excel("Datos_Basketball_patido_NBA.xlsx", sheet_name="Partido1", usecols="A:D")
+# Function to load and process data for a given match
+def load_match_data(sheet_name):
+    data = pd.read_excel("Datos_Basketball_patido_NBA.xlsx", sheet_name=sheet_name, usecols="A:D")
+    area_codes = {"A1": "Zona 1", "A2": "Zona 2", "A3": "Zona 3", "A4": "Zona 4"}
+    shot_type_codes = {1: "Tiro libre", 2: "Tiro de campo", 3: "Tiro de 3 puntos", 4: "Bandeja"}
+    data["Área"] = data["Área"].map(area_codes)
+    data["Tipo de Tiro"] = data["Tipo de Tiro"].map(shot_type_codes)
+    return data
 
-# Define area and shot type codifications
-area_codes = {"A1": "Zona 1", "A2": "Zona 2", "A3": "Zona 3", "A4": "Zona 4"}
-shot_type_codes = {1: "Tiro libre", 2: "Tiro de campo", 3: "Tiro de 3 puntos", 4: "Bandeja"}
-
-# Apply codifications to the data
-data["Área"] = data["Área"].map(area_codes)
-data["Tipo de Tiro"] = data["Tipo de Tiro"].map(shot_type_codes)
-
-# Create Streamlit app
+# Streamlit app
 st.title("Dashboard de Análisis de Tiros")
+
+# Match selection dropdown
+match_options = ["Partido 1", "Partido 2", "Partido 3"]  # Add more matches as needed
+selected_match = st.selectbox("Seleccionar Partido", match_options)
+
+# Load and process data for the selected match
+data = load_match_data(selected_match)
 
 # Display area and shot type codifications
 st.sidebar.header("Codificación")
@@ -28,22 +33,35 @@ st.dataframe(data)
 # Interactive visualizations
 st.header("Visualizaciones")
 
+# Combine data from all matches for overall visualizations
+all_matches_data = pd.concat([load_match_data(sheet) for sheet in match_options])
+
 # Shots made vs missed by area
-fig1 = px.histogram(data, x="Área", color="Encestó", barmode="group",
-                   title="Tiros Encestados vs Fallados por Área")
+fig1 = px.histogram(
+    all_matches_data,
+    x="Área",
+    color="Encestó",
+    barmode="group",
+    title="Tiros Encestados vs Fallados por Área (Todos los Partidos)",
+)
 st.plotly_chart(fig1)
 
 # Shots made vs missed by shot type
-fig2 = px.histogram(data, x="Tipo de Tiro", color="Encestó", barmode="group",
-                   title="Tiros Encestados vs Fallados por Tipo de Tiro")
+fig2 = px.histogram(
+    all_matches_data,
+    x="Tipo de Tiro",
+    color="Encestó",
+    barmode="group",
+    title="Tiros Encestados vs Fallados por Tipo de Tiro (Todos los Partidos)",
+)
 st.plotly_chart(fig2)
 
 # Shot success rate by area
-shot_counts = data.groupby("Área")["Encestó"].value_counts(normalize=True).unstack()
-fig3 = px.bar(shot_counts, title="Porcentaje de Tiros Encestados por Área")
+shot_counts = all_matches_data.groupby("Área")["Encestó"].value_counts(normalize=True).unstack()
+fig3 = px.bar(shot_counts, title="Porcentaje de Tiros Encestados por Área (Todos los Partidos)")
 st.plotly_chart(fig3)
 
 # Shot success rate by shot type
-shot_counts = data.groupby("Tipo de Tiro")["Encestó"].value_counts(normalize=True).unstack()
-fig4 = px.bar(shot_counts, title="Porcentaje de Tiros Encestados por Tipo de Tiro")
+shot_counts = all_matches_data.groupby("Tipo de Tiro")["Encestó"].value_counts(normalize=True).unstack()
+fig4 = px.bar(shot_counts, title="Porcentaje de Tiros Encestados por Tipo de Tiro (Todos los Partidos)")
 st.plotly_chart(fig4)
