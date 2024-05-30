@@ -2,11 +2,13 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 
+# Area and shot type mappings
+area_codes = {"A1": "Zona 1", "A2": "Zona 2", "A3": "Zona 3", "A4": "Zona 4"}
+shot_type_codes = {1: "Tiro libre", 2: "Tiro de campo", 3: "Tiro de 3 puntos", 4: "Bandeja"}
+
 # Function to load and process data for a given match
 def load_match_data(sheet_name):
     data = pd.read_excel("Datos_Basketball_patido_NBA.xlsx", sheet_name=sheet_name, usecols="A:D")
-    area_codes = {"A1": "Zona 1", "A2": "Zona 2", "A3": "Zona 3", "A4": "Zona 4"}
-    shot_type_codes = {1: "Tiro libre", 2: "Tiro de campo", 3: "Tiro de 3 puntos", 4: "Bandeja"}
     data["Área"] = data["Área"].map(area_codes)
     data["Tipo de Tiro"] = data["Tipo de Tiro"].map(shot_type_codes)
     return data
