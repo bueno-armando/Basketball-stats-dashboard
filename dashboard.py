@@ -32,11 +32,26 @@ st.sidebar.write("Tipos de Tiro:", shot_type_codes)
 st.header("Datos de Tiros")
 st.dataframe(data)
 
+# Label for shot data
+st.header("Datos de Tiros")
+
+# Display shot areas reference graph
+st.image("Área de tiro.png")
+
 # Interactive visualizations
 st.header("Visualizaciones")
 
 # Combine data from all matches for overall visualizations
 all_matches_data = pd.concat([load_match_data(sheet) for sheet in match_options])
+
+# Chance of scoring by shot number
+fig5 = px.line(
+    all_matches_data,
+    x="Número de Tiro",
+    y="Encestó",
+    title="Probabilidad de Encestar por Número de Tiro (Todos los Partidos)",
+)
+st.plotly_chart(fig5)
 
 # Shots made vs missed by area
 fig1 = px.histogram(
